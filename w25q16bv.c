@@ -139,7 +139,7 @@ static ssize_t W25Q16BV_read(struct file *filp, char __user *buff, size_t len, l
 
     if(*off+len > W25Q16BV_TOTAL_SIZE) len = W25Q16BV_TOTAL_SIZE-*off;
 
-    kbuf = kmalloc(len, GFP_KERNEL); 
+    kbuf = kmalloc(len, GFP_KERNEL);
     if(!kbuf) return -ENOMEM;
 
     // Configure command to read data
@@ -208,7 +208,7 @@ static ssize_t W25Q16BV_write(struct file *filp, const char __user *ubuf, size_t
         task[1].len = W25Q16BV_PAGE_SIZE; 
         spi_message_add_tail(&task[1], &message); 
         
-        ret=spi_sync(w25q16bv_spi_dev, &message); 
+        ret = spi_sync(w25q16bv_spi_dev, &message); 
         if(ret) goto out; 
         
         // Copy readed data to user
@@ -217,7 +217,8 @@ static ssize_t W25Q16BV_write(struct file *filp, const char __user *ubuf, size_t
             goto out; 
         }
         for(size_t i=0;i<W25Q16BV_PAGE_SIZE;i++){ 
-            if(~page[i]){ ret = w25q16bv_sector_erase(sbase); 
+            if(~page[i]){ 
+                ret = w25q16bv_sector_erase(sbase); 
                 if(ret) goto out; 
                 break;
             } 
@@ -268,7 +269,7 @@ static int W25Q16BV_probe(struct spi_device *spi){
 }
 
 static void W25Q16BV_remove(struct spi_device *spi){ 
-    device_destroy(dev_class,dev_num); 
+    device_destroy(dev_class, dev_num); 
     cdev_del(&w25q16bv_cdev); 
     w25q16bv_spi_dev=NULL; 
     pr_info("W25Q16BV driver removed\n"); 
@@ -324,3 +325,7 @@ module_exit(w25q16bv_exit);
 MODULE_LICENSE("GPL"); 
 MODULE_AUTHOR("Caio Felipe"); 
 MODULE_DESCRIPTION("Driver SPI for W25Q16BV flash memory");
+
+// echo -n "testando o driver para a memoria flash" | sudo dd of=/dev/spiflash bs=1
+
+// sudo dd if=/dev/spiflash bs=1 count=64 |hexdump -C
